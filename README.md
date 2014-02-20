@@ -1,5 +1,6 @@
-Percheron: A Distributed Object [File] Store - in Go
-===================================================
+Percheron
+==========
+# A Distributed Object [File] Store - in Go
 
 ## Design
 
@@ -23,15 +24,13 @@ Percheron is designed to provide a simple interface, similar to [S3](http://aws.
   * impose a simple, straightforward storage [structure or heiarchy] design
 
 
-Identifiers
-===========
+### Identifiers
 UUID v4 was chosen as a preventative measure against brute-force guessing of URL paths. Even if a person does not have access to download the file, knowing the path [if it was descriptive] can give someone insight into what kind of information the file contains.
 
 This is however contradicted by the fact we use descriptive names for buckets. The reason for this was to not impose a URL that was completely 'unique', but at least 'readable' by a human.
 
 
-Storage Structure
-=================
+### Storage Structure
 
 ```
   /storage (root of the backing storage)
@@ -73,7 +72,6 @@ GET    http://storageproxy.example.org/mybucket/d9cfbc4e-49d8-4f8d-9973-8f3cecdf
 ```
 
 
-Constraints
-===========
+## Constraints
   * [Follow same naming convention for buckets as S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html)
     * This means bucket names are unique throughout the entire system
