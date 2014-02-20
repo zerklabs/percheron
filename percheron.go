@@ -23,8 +23,8 @@ type ObjMetadata struct {
 	Size         int64
 	Created      time.Time
 	Modified     time.Time
-	Owner        uuid.UUID
-	ID           uuid.UUID
+	Owner        *uuid.UUID
+	ID           *uuid.UUID
 	Checksum     string
 	ChecksumHash string
 }
