@@ -11,11 +11,25 @@ fi
 
 # Install dependencies
 echo "--> Installing dependencies to speed up builds..."
-go get ./...
+go get -u ./...
 
 # Build!
 echo "--> Building percherond"
 go build \
     -v \
     -o dist/percherond${EXTENSION} \
-    $(percheron/*.go percherond/*.go)
+    percherond/*.go
+
+# Build!
+echo "--> Building perchauthd"
+go build \
+    -v \
+    -o dist/perchauthd${EXTENSION} \
+    perchauthd/*.go
+
+# Build!
+echo "--> Building perchcli"
+go build \
+    -v \
+    -o dist/perchcli${EXTENSION} \
+    perchcli/*.go

@@ -19,14 +19,14 @@ type Bucket struct {
 }
 
 // TODO(rch): add directory creation
-func (user *UserInfo) NewBucket(name string) (Bucket, error) {
+func (user *UserInfo) NewBucket(name string) (*Bucket, error) {
 	id, err := uuid.NewV4()
 
 	if err != nil {
-		return Bucket{}, err
+		return &Bucket{}, err
 	}
 
-	bucket := make(Bucket)
+	bucket := new(Bucket)
 
 	bucket.Name = name
 	bucket.Created = time.Now()
