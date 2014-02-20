@@ -1,14 +1,17 @@
 package percheron
 
 import (
+	"github.com/cabrel/auburn"
 	"github.com/nu7hatch/gouuid"
+	"net"
 	"time"
 )
 
 type User struct {
-	Email   string
-	Created time.Time
-	ID      *uuid.UUID
+	Email    string
+	Created  time.Time
+	ID       *uuid.UUID
+	AccessID string
 }
 
 type Bucket struct {
@@ -19,66 +22,53 @@ type Bucket struct {
 }
 
 type ObjMetadata struct {
-	Name         string
-	Size         int64
-	Created      time.Time
-	Modified     time.Time
-	Owner        *uuid.UUID
-	ID           *uuid.UUID
-	Checksum     string
-	ChecksumHash string
+	Name     string
+	Size     int64
+	Created  time.Time
+	Modified time.Time
+	Owner    *uuid.UUID
+	ID       *uuid.UUID
+	Checksum []byte
+	HashType string
+}
+
+type PerchStore struct {
+	Path  string
+	Peers []net.IPAddr
 }
 
 // TODO(rch): add directory creation
 func (user *User) NewBucket(name string) (*Bucket, error) {
-	id, err := uuid.NewV4()
-
-	if err != nil {
-		return &Bucket{}, err
-	}
-
 	bucket := new(Bucket)
 
 	bucket.Name = name
 	bucket.Created = time.Now()
 	bucket.Owner = user.ID
-	bucket.ID = id
+	bucket.ID = auburn.GenUUID()
 
 	return bucket, nil
 }
 
 // TODO(rch): add directory creation
-func NewUserInfo(email string) (*User, error) {
-	id, err := uuid.NewV4()
-
-	if err != nil {
-		return &User{}, err
-	}
-
+func (store *PerchStore) NewUserInfo(email string) (*User, error) {
 	user := new(User)
 
 	user.Email = email
 	user.Created = time.Now()
-	user.ID = id
+	user.ID = auburn.GenUUID()
 
 	return user, nil
 }
 
 // TODO(rch): add directory creation
 func (bucket *Bucket) NewObject(name string) (*ObjMetadata, error) {
-	id, err := uuid.NewV4()
-
-	if err != nil {
-		return &ObjMetadata{}, err
-	}
-
 	obj := new(ObjMetadata)
 
 	obj.Name = name
 	obj.Created = time.Now()
 	obj.Created = obj.Created
 	obj.Owner = bucket.Owner
-	obj.ID = id
+	obj.ID = auburn.GenUUID()
 
 	return obj, nil
 }

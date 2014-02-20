@@ -33,3 +33,10 @@ go build \
     -v \
     -o dist/perchcli${EXTENSION} \
     perchcli/*.go
+
+# Build!
+echo "--> Building perchlookupd"
+go build \
+    -v \
+    -o dist/perchlookupd${EXTENSION} \
+    perchlookupd/*.go
