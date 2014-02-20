@@ -37,13 +37,13 @@ This is however contradicted by the fact we use descriptive names for buckets. T
   |
   |-- /<user id> (user root folder)
   |   |
-  |   |-- USERINFO.gob ([Description](docs/USERINFO.md))
+  |   |-- USERINFO.gob
   |   |-- /<bucket> (bucket root folder)
   |   |   |
-  |   |   |-- BUCKET.gob ([Description](docs/BUCKET.md))
+  |   |   |-- BUCKET.gob
   |   |   |-- /<object id> (object root folder)
   |   |   |   |
-  |   |   |   |-- METADATA.gob ([Description](docs/METADATA.md))
+  |   |   |   |-- METADATA.gob
   |   |   |   |-- <object> (file)
   -------------
 
@@ -70,6 +70,11 @@ example URLs:
 GET    http://storageproxy.example.org/mybucket/eac590d4-2681-4947-9c1a-26c8e1765da2
 GET    http://storageproxy.example.org/mybucket/d9cfbc4e-49d8-4f8d-9973-8f3cecdfc857
 ```
+
+### Metadata
+  * [USERINFO.gob](docs/USERINFO.md)
+  * [BUCKET.gob](docs/BUCKET.md)
+  * [OBJMETADATA.gob](docs/OBJMETADATA.md)
 
 
 ## Constraints
