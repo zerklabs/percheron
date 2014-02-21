@@ -1,8 +1,8 @@
-package percherond
+package main
 
-import (
-	"github.com/cabrel/percheron"
-)
+// import (
+// 	"github.com/cabrel/percheron"
+// )
 
 func main() {
 

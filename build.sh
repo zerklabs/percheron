@@ -1,42 +1,26 @@
 #!/bin/bash
 #
 # This script builds the application from source.
-set -e
-
 # If we're building on Windows, specify an extension
 EXTENSION=""
+DISTPATH="dist/"
 if [ "$(go env GOOS)" = "windows" ]; then
     EXTENSION=".exe"
+    DISTPATH="dist\\"
 fi
-
-# Install dependencies
-echo "--> Installing dependencies to speed up builds..."
-go get -u ./...
 
 # Build!
 echo "--> Building percherond"
-go build \
-    -v \
-    -o dist/percherond${EXTENSION} \
-    percherond/*.go
+go build -v -o ${DISTPATH}percherond${EXTENSION} percheron/percherond
 
 # Build!
 echo "--> Building perchauthd"
-go build \
-    -v \
-    -o dist/perchauthd${EXTENSION} \
-    perchauthd/*.go
+go build -v -o ${DISTPATH}perchauthd${EXTENSION} percheron/perchauthd
 
 # Build!
-echo "--> Building perchcli"
-go build \
-    -v \
-    -o dist/perchcli${EXTENSION} \
-    perchcli/*.go
+echo "--> Building perch-cli"
+go build -v -o ${DISTPATH}perchcli${EXTENSION} percheron/perch-cli
 
 # Build!
 echo "--> Building perchlookupd"
-go build \
-    -v \
-    -o dist/perchlookupd${EXTENSION} \
-    perchlookupd/*.go
+go build -v -o ${DISTPATH}perchlookupd${EXTENSION} percheron/perchlookupd

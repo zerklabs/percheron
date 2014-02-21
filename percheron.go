@@ -3,6 +3,7 @@ package percheron
 import (
 	"github.com/cabrel/auburn"
 	"github.com/nu7hatch/gouuid"
+	"log"
 	"net"
 	"time"
 )
@@ -71,4 +72,21 @@ func (bucket *Bucket) NewObject(name string) (*ObjMetadata, error) {
 	obj.ID = auburn.GenUUID()
 
 	return obj, nil
+}
+
+func NewPerchStore(folderPath string) *PerchStore {
+	yes, err := DoesDirExist(folderPath)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if yes {
+		// no error means the stat returned successfully
+		return &PerchStore{Path: folderPath}
+	}
+
+	log.Fatalf("%s does not exist or cannot be accessed", folderPath)
+
+	return &PerchStore{}
 }

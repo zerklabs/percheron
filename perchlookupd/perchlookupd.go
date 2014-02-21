@@ -1,4 +1,4 @@
-package percherond
+package main
 
 import (
 	"flag"
@@ -8,14 +8,11 @@ import (
 	"runtime"
 )
 
-// var redisServer = flag.String("host", "127.0.0.1", "Redis Server")
-// var redisServerPort = flag.Int("port", 6379, "Redis Server Port")
-// var responseUrl = flag.String("url", "https://passwords.cobhamna.com", "Server Response URL")
-// var redisKeyPrefix = flag.String("prefix", "masq-prod", "Key prefix in Redis for Dictionary")
 var listenIP = flag.String("host", "", "IP to run the webserver on")
 var listenOn = flag.Int("listen", 8080, "Port to run the webserver on")
 var certificatePath = flag.String("cert", "", "Certificate file for TLS (.pem) (Optional)")
 var keyPath = flag.String("key", "", "Private key for certificate (Required if cert given)")
+var storePath = flag.String("path", "", "Root of storage path")
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
