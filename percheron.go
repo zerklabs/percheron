@@ -1,6 +1,8 @@
 package percheron
 
 import (
+	"bytes"
+	"encoding/gob"
 	"github.com/nu7hatch/gouuid"
 	"github.com/zerklabs/auburn"
 	"log"
@@ -39,7 +41,7 @@ type PerchStore struct {
 }
 
 // TODO(rch): add directory creation
-func (user *User) NewBucket(name string) (*Bucket, error) {
+func (user User) NewBucket(name string) (*Bucket, error) {
 	bucket := new(Bucket)
 
 	bucket.Name = name
@@ -51,7 +53,7 @@ func (user *User) NewBucket(name string) (*Bucket, error) {
 }
 
 // TODO(rch): add directory creation
-func (store *PerchStore) NewUserInfo(email string) (*User, error) {
+func (store PerchStore) NewUserInfo(email string) (*User, error) {
 	user := new(User)
 
 	user.Email = email
@@ -62,7 +64,7 @@ func (store *PerchStore) NewUserInfo(email string) (*User, error) {
 }
 
 // TODO(rch): add directory creation
-func (bucket *Bucket) NewObject(name string) (*ObjMetadata, error) {
+func (bucket Bucket) NewObject(name string) (*ObjMetadata, error) {
 	obj := new(ObjMetadata)
 
 	obj.Name = name
@@ -89,4 +91,34 @@ func NewPerchStore(folderPath string) *PerchStore {
 	log.Fatalf("%s does not exist or cannot be accessed", folderPath)
 
 	return &PerchStore{}
+}
+
+// Marshal the User struct into a byte array
+func (self User) Marshal() []byte {
+	var bin bytes.Buffer
+
+	// Create an encoder and send a value.
+	enc := gob.NewEncoder(&bin)
+	err := enc.Encode(self)
+
+	if err != nil {
+		log.Fatal("encode:", err)
+	}
+
+	return bin.Bytes()
+}
+
+// Marshal the ObjMetadata struct into a byte array
+func (self ObjMetadata) Marshal() []byte {
+	var bin bytes.Buffer
+
+	// Create an encoder and send a value.
+	enc := gob.NewEncoder(&bin)
+	err := enc.Encode(self)
+
+	if err != nil {
+		log.Fatal("encode:", err)
+	}
+
+	return bin.Bytes()
 }

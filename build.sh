@@ -9,18 +9,22 @@ if [ "$(go env GOOS)" = "windows" ]; then
     DISTPATH="dist\\"
 fi
 
+
+echo "--> Building percheron"
+go build -v
+
 # Build!
 echo "--> Building percherond"
-go build -v -o ${DISTPATH}percherond${EXTENSION} percheron/percherond
+go build -v -o dist/percherond${EXTENSION} github.com/zerklabs/percheron/percherond
 
 # Build!
 echo "--> Building perchauthd"
-go build -v -o ${DISTPATH}perchauthd${EXTENSION} percheron/perchauthd
+go build -v -o dist/perchauthd${EXTENSION} github.com/zerklabs/percheron/perchauthd
 
 # Build!
 echo "--> Building perch-cli"
-go build -v -o ${DISTPATH}perchcli${EXTENSION} percheron/perch-cli
+go build -v -o dist/perchcli${EXTENSION} github.com/zerklabs/percheron/perch-cli
 
 # Build!
 echo "--> Building perchlookupd"
-go build -v -o ${DISTPATH}perchlookupd${EXTENSION} percheron/perchlookupd
+go build -v -o dist/perchlookupd${EXTENSION} github.com/zerklabs/percheron/perchlookupd
