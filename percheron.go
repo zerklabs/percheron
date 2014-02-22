@@ -3,19 +3,13 @@ package percheron
 import (
 	"bytes"
 	"encoding/gob"
+	// "github.com/garyburd/redigo/redis"
 	"github.com/nu7hatch/gouuid"
 	"github.com/zerklabs/auburn"
 	"log"
 	"net"
 	"time"
 )
-
-type User struct {
-	Email    string
-	Created  time.Time
-	ID       *uuid.UUID
-	AccessID string
-}
 
 type Bucket struct {
 	Name    string
@@ -36,12 +30,14 @@ type ObjMetadata struct {
 }
 
 type PerchStore struct {
-	Path  string
-	Peers []net.IPAddr
+	Path      string
+	RedisHost string
+	RedisPort int
+	Peers     []net.IPAddr
 }
 
 // TODO(rch): add directory creation
-func (user User) NewBucket(name string) (*Bucket, error) {
+func (user *User) NewBucket(name string) (*Bucket, error) {
 	bucket := new(Bucket)
 
 	bucket.Name = name
@@ -53,18 +49,7 @@ func (user User) NewBucket(name string) (*Bucket, error) {
 }
 
 // TODO(rch): add directory creation
-func (store PerchStore) NewUserInfo(email string) (*User, error) {
-	user := new(User)
-
-	user.Email = email
-	user.Created = time.Now()
-	user.ID = auburn.GenUUID()
-
-	return user, nil
-}
-
-// TODO(rch): add directory creation
-func (bucket Bucket) NewObject(name string) (*ObjMetadata, error) {
+func (bucket *Bucket) NewObject(name string) *ObjMetadata {
 	obj := new(ObjMetadata)
 
 	obj.Name = name
@@ -73,7 +58,7 @@ func (bucket Bucket) NewObject(name string) (*ObjMetadata, error) {
 	obj.Owner = bucket.Owner
 	obj.ID = auburn.GenUUID()
 
-	return obj, nil
+	return obj
 }
 
 func NewPerchStore(folderPath string) *PerchStore {
@@ -85,31 +70,19 @@ func NewPerchStore(folderPath string) *PerchStore {
 
 	if yes {
 		// no error means the stat returned successfully
-		return &PerchStore{Path: folderPath}
+		store := new(PerchStore)
+		store.Path = folderPath
+
+		return store
 	}
 
 	log.Fatalf("%s does not exist or cannot be accessed", folderPath)
 
-	return &PerchStore{}
-}
-
-// Marshal the User struct into a byte array
-func (self User) Marshal() []byte {
-	var bin bytes.Buffer
-
-	// Create an encoder and send a value.
-	enc := gob.NewEncoder(&bin)
-	err := enc.Encode(self)
-
-	if err != nil {
-		log.Fatal("encode:", err)
-	}
-
-	return bin.Bytes()
+	return new(PerchStore)
 }
 
 // Marshal the ObjMetadata struct into a byte array
-func (self ObjMetadata) Marshal() []byte {
+func (self *ObjMetadata) Marshal() []byte {
 	var bin bytes.Buffer
 
 	// Create an encoder and send a value.

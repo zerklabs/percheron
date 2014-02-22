@@ -25,9 +25,15 @@ func main() {
 		HttpIp:   *listenIP,
 	}
 
-	store := &percheron.NewPerchStore(storePath)
-	user := store.NewUserInfo("cabrel@zerklabs.com")
-	log.Print(user.Marshal())
+	store := percheron.NewPerchStore(*storePath)
+	user := store.NewUser("cabrel@zerklabs.com")
+
+	b := user.Marshal()
+
+	log.Print(b)
+
+	var u percheron.User
+	log.Print(u.Unmarshal(b))
 
 	server.Handle("/lookup/users", lookupUsers)
 	server.Handle("/lookup/objects", lookupObjects)
