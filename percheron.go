@@ -1,8 +1,8 @@
 package percheron
 
 import (
-	"github.com/cabrel/auburn"
 	"github.com/nu7hatch/gouuid"
+	"github.com/zerklabs/auburn"
 	"log"
 	"net"
 	"time"
@@ -67,7 +67,7 @@ func (bucket *Bucket) NewObject(name string) (*ObjMetadata, error) {
 
 	obj.Name = name
 	obj.Created = time.Now()
-	obj.Created = obj.Created
+	obj.Modified = obj.Created
 	obj.Owner = bucket.Owner
 	obj.ID = auburn.GenUUID()
 

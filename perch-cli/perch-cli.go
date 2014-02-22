@@ -1,7 +1,7 @@
 package main
 
 // import (
-// 	"github.com/cabrel/percheron"
+// 	"github.com/zerklabs/percheron"
 // )
 
 func main() {

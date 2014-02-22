@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"github.com/cabrel/auburn"
-	"github.com/cabrel/percheron"
+	"github.com/zerklabs/auburn"
+	"github.com/zerklabs/percheron"
 	"log"
 	"runtime"
 )
