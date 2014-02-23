@@ -1,9 +1,10 @@
 package percheron
 
 import (
-	// "github.com/garyburd/redigo/redis"
+	"github.com/garyburd/redigo/redis"
 	"log"
 	"net"
+	"time"
 )
 
 // ACL constants for Objects
@@ -16,24 +17,26 @@ const (
 	ACL_AUTH_READ
 )
 
-// Grant-ACL supported headers
-// See: http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectPUTacl.html
-var allowed_auth_headers = []string{
-	"x-perch-grant-read",
-	"x-perch-grant-write",
-	"x-perch-grant-read-acp",
-	"x-perch-grant-write-acp",
-	"x-perch-grant-full-control",
-}
+var (
+	// Grant-ACL supported headers
+	// See: http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectPUTacl.html
+	allowed_auth_headers = []string{
+		"x-p-grant-read",
+		"x-p-grant-write",
+		"x-p-grant-read-acp",
+		"x-p-grant-write-acp",
+		"x-p-grant-full-control",
+	}
+)
 
 type PerchStore struct {
 	Path      string
 	RedisHost string
-	RedisPort int
+	Pool      *redis.Pool
 	Peers     []net.IPAddr
 }
 
-func NewPerchStore(folderPath string) *PerchStore {
+func NewPerchStore(folderPath string, redisHost string) *PerchStore {
 	yes, err := DoesDirExist(folderPath)
 
 	if err != nil {
@@ -44,6 +47,7 @@ func NewPerchStore(folderPath string) *PerchStore {
 		// no error means the stat returned successfully
 		store := new(PerchStore)
 		store.Path = folderPath
+		store.RedisHost = redisHost
 
 		return store
 	}
@@ -51,4 +55,28 @@ func NewPerchStore(folderPath string) *PerchStore {
 	log.Fatalf("%s does not exist or cannot be accessed", folderPath)
 
 	return new(PerchStore)
+}
+
+func (self *PerchStore) EstablishPool() {
+	self.Pool = &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.Dial("tcp", self.RedisHost)
+			if err != nil {
+				log.Fatal(err)
+				return nil, err
+			}
+
+			return c, err
+		},
+		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			_, err := c.Do("PING")
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			return err
+		},
+	}
 }

@@ -8,13 +8,19 @@ import (
 	"runtime"
 )
 
-var listenIP = flag.String("host", "", "IP to run the webserver on")
-var listenOn = flag.Int("listen", 8080, "Port to run the webserver on")
-var certificatePath = flag.String("cert", "", "Certificate file for TLS (.pem) (Optional)")
-var keyPath = flag.String("key", "", "Private key for certificate (Required if cert given)")
-var storePath = flag.String("path", "", "Root of storage path")
+var (
+	listenIP        = flag.String("host", "", "IP to run the webserver on")
+	listenOn        = flag.Int("listen", 8080, "Port to run the webserver on")
+	certificatePath = flag.String("cert", "", "Certificate file for TLS (.pem) (Optional)")
+	keyPath         = flag.String("key", "", "Private key for certificate (Required if cert given)")
+	storePath       = flag.String("path", "", "Root of storage path")
+	redisHost       = flag.String("redis", "127.0.0.1:6379", "Redis Server")
 
-var store *percheron.PerchStore
+	store   *percheron.PerchStore
+	users   []percheron.User
+	objects []percheron.Object
+	buckets []percheron.Bucket
+)
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -27,7 +33,11 @@ func main() {
 		HttpIp:   *listenIP,
 	}
 
-	store = percheron.NewPerchStore(*storePath)
+	store = percheron.NewPerchStore(*storePath, *redisHost)
+
+	go fetchUsers()
+	go fetchBuckets()
+	go fetchObjects()
 
 	server.Handle("/lookup/users", lookupUsers)
 	server.Handle("/lookup/objects", lookupObjects)
@@ -46,16 +56,19 @@ func main() {
 	}
 }
 
-func fetchUsers(perch *percheron.PerchStore) {
-
+func fetchUsers() {
+	conn := store.Pool.Get()
+	defer conn.Close()
 }
 
-func fetchBuckets(perch *percheron.PerchStore) {
-
+func fetchBuckets() {
+	conn := store.Pool.Get()
+	defer conn.Close()
 }
 
-func fetchObjects(perch *percheron.PerchStore) {
-
+func fetchObjects() {
+	conn := store.Pool.Get()
+	defer conn.Close()
 }
 
 func lookupUsers(req *auburn.AuburnHttpRequest) {

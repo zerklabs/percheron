@@ -3,9 +3,12 @@ package percheron
 import (
 	"bytes"
 	"encoding/gob"
+	"errors"
 	// "github.com/garyburd/redigo/redis"
+	"fmt"
 	"github.com/zerklabs/auburn"
 	"log"
+	"os"
 	"path/filepath"
 	"time"
 )
@@ -27,7 +30,7 @@ type Object struct {
 }
 
 // TODO(rch): add directory creation
-func (bucket *Bucket) NewObject(name string) *Object {
+func (bucket *Bucket) NewObject(name string, size int64) (*Object, error) {
 	obj := new(Object)
 
 	obj.Name = name
@@ -37,8 +40,24 @@ func (bucket *Bucket) NewObject(name string) *Object {
 	obj.BucketID = bucket.ID
 	obj.ID = auburn.GenStrUUID()
 	obj.Path = filepath.Join(bucket.Path, obj.ID)
+	obj.ACL = ACL_PRIVATE
+	obj.Size = size
 
-	return obj
+	exists, err := DoesDirExist(obj.Path)
+
+	if err != nil {
+		return &Object{}, err
+	}
+
+	if exists {
+		return &Object{}, errors.New("Object already exists")
+	}
+
+	if err := os.Mkdir(obj.Path, 0655); err != nil {
+		return &Object{}, err
+	}
+
+	return obj, nil
 }
 
 func (self *Object) Key() string {

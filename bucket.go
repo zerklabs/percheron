@@ -7,6 +7,7 @@ import (
 	// "github.com/garyburd/redigo/redis"
 	"github.com/zerklabs/auburn"
 	"log"
+	"os"
 	"path/filepath"
 	"time"
 )
@@ -37,6 +38,10 @@ func (store *PerchStore) NewBucket(name string, owner *User) (*Bucket, error) {
 
 	if exists {
 		return &Bucket{}, errors.New("Bucket already exists")
+	}
+
+	if err := os.Mkdir(bucket.Path, 0655); err != nil {
+		return &Bucket{}, err
 	}
 
 	return bucket, nil
