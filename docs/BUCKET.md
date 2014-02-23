@@ -3,9 +3,10 @@ BUCKET.gob
 
 ```
 type Bucket struct {
-  Name       string
-  Created    time
-  Owner      UUIDv4
-  ID         UUIDv4
+  Name    string
+  Created time.Time
+  OwnerID string
+  ID      string
+  Path    string
 }
 ```

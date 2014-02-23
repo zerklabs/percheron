@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/gob"
 	// "github.com/garyburd/redigo/redis"
-	"github.com/nu7hatch/gouuid"
 	"github.com/zerklabs/auburn"
 	"log"
 	"time"
@@ -13,7 +12,7 @@ import (
 type User struct {
 	Email    string
 	Created  time.Time
-	ID       *uuid.UUID
+	ID       string
 	AccessID string
 }
 
@@ -23,7 +22,7 @@ func (store *PerchStore) NewUser(email string) *User {
 
 	user.Email = email
 	user.Created = time.Now()
-	user.ID = auburn.GenUUID()
+	user.ID = auburn.GenStrUUID()
 
 	return user
 }

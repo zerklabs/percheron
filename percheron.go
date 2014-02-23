@@ -1,32 +1,29 @@
 package percheron
 
 import (
-	"bytes"
-	"encoding/gob"
 	// "github.com/garyburd/redigo/redis"
-	"github.com/nu7hatch/gouuid"
-	"github.com/zerklabs/auburn"
 	"log"
 	"net"
-	"time"
 )
 
-type Bucket struct {
-	Name    string
-	Created time.Time
-	Owner   *uuid.UUID
-	ID      *uuid.UUID
-}
+// ACL constants for Objects
+//
+// Default: ACL_PRIVATE
+const (
+	ACL_PRIVATE = iota
+	ACL_PUBLIC_READ
+	ACL_PUBLIC_READ_WRITE
+	ACL_AUTH_READ
+)
 
-type ObjMetadata struct {
-	Name     string
-	Size     int64
-	Created  time.Time
-	Modified time.Time
-	Owner    *uuid.UUID
-	ID       *uuid.UUID
-	Checksum []byte
-	HashType string
+// Grant-ACL supported headers
+// See: http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectPUTacl.html
+var allowed_auth_headers = []string{
+	"x-perch-grant-read",
+	"x-perch-grant-write",
+	"x-perch-grant-read-acp",
+	"x-perch-grant-write-acp",
+	"x-perch-grant-full-control",
 }
 
 type PerchStore struct {
@@ -34,31 +31,6 @@ type PerchStore struct {
 	RedisHost string
 	RedisPort int
 	Peers     []net.IPAddr
-}
-
-// TODO(rch): add directory creation
-func (user *User) NewBucket(name string) (*Bucket, error) {
-	bucket := new(Bucket)
-
-	bucket.Name = name
-	bucket.Created = time.Now()
-	bucket.Owner = user.ID
-	bucket.ID = auburn.GenUUID()
-
-	return bucket, nil
-}
-
-// TODO(rch): add directory creation
-func (bucket *Bucket) NewObject(name string) *ObjMetadata {
-	obj := new(ObjMetadata)
-
-	obj.Name = name
-	obj.Created = time.Now()
-	obj.Modified = obj.Created
-	obj.Owner = bucket.Owner
-	obj.ID = auburn.GenUUID()
-
-	return obj
 }
 
 func NewPerchStore(folderPath string) *PerchStore {
@@ -79,19 +51,4 @@ func NewPerchStore(folderPath string) *PerchStore {
 	log.Fatalf("%s does not exist or cannot be accessed", folderPath)
 
 	return new(PerchStore)
-}
-
-// Marshal the ObjMetadata struct into a byte array
-func (self *ObjMetadata) Marshal() []byte {
-	var bin bytes.Buffer
-
-	// Create an encoder and send a value.
-	enc := gob.NewEncoder(&bin)
-	err := enc.Encode(self)
-
-	if err != nil {
-		log.Fatal("encode:", err)
-	}
-
-	return bin.Bytes()
 }

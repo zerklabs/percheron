@@ -14,6 +14,8 @@ var certificatePath = flag.String("cert", "", "Certificate file for TLS (.pem) (
 var keyPath = flag.String("key", "", "Private key for certificate (Required if cert given)")
 var storePath = flag.String("path", "", "Root of storage path")
 
+var store *percheron.PerchStore
+
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
@@ -25,15 +27,7 @@ func main() {
 		HttpIp:   *listenIP,
 	}
 
-	store := percheron.NewPerchStore(*storePath)
-	user := store.NewUser("cabrel@zerklabs.com")
-
-	b := user.Marshal()
-
-	log.Print(b)
-
-	var u percheron.User
-	log.Print(u.Unmarshal(b))
+	store = percheron.NewPerchStore(*storePath)
 
 	server.Handle("/lookup/users", lookupUsers)
 	server.Handle("/lookup/objects", lookupObjects)
