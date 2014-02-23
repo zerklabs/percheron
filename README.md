@@ -1,6 +1,8 @@
 Percheron
 ==========
-# A Distributed Object [File] Store - in Go
+# An Object [File] Store-to-disk Proxy - in Go
+
+__This is a proof-of-concept (i.e. not for production use)__
 
 ## Design
 
@@ -33,63 +35,61 @@ This is however contradicted by the fact we use descriptive names for buckets. T
 ### Storage Layout
 
 ```
-  /storage (root of the backing storage)
+  /storage (root of the backing storage system)
   |
-  |-- /<user id> (user root folder)
+  |-- /<bucket> (bucket root folder)
   |   |
-  |   |-- USERINFO.gob
-  |   |-- /<bucket> (bucket root folder)
+  |   |-- /<object id> (object root folder)
   |   |   |
-  |   |   |-- BUCKET.gob
-  |   |   |-- /<object id> (object root folder)
-  |   |   |   |
-  |   |   |   |-- METADATA.gob
-  |   |   |   |-- <object> (file)
+  |   |   |-- <object> (file, split into 4MB chunks)
   -------------
 
 results in:
 
-/storage/<UUIDv4>/<bucket>/<UUIDv4>/<object>
+/storage/<bucket>/<UUIDv4>/<object>
 ```
 
-example filesystem paths:
+resulting (example) filesystem paths:
 
 ```
-/storage/d0bd8bb3-ae40-477e-af4e-7cb9d72e70e0/mybucket/eac590d4-2681-4947-9c1a-26c8e1765da2/myfile.zip
-/storage/d0bd8bb3-ae40-477e-af4e-7cb9d72e70e0/mybucket/d9cfbc4e-49d8-4f8d-9973-8f3cecdfc857/myotherfile.zip
+/storage/mybucket/eac590d4-2681-4947-9c1a-26c8e1765da2/0_hash
+/storage/mybucket/eac590d4-2681-4947-9c1a-26c8e1765da2/1_hash
 ```
 
 Where:
-  * __d0bd8bb3-ae40-477e-af4e-7cb9d72e70e0__ is the user id
   * __mybucket__ is the bucket
   * __eac590d4-2681-4947-9c1a-26c8e1765da2__ is the object id of myfile.zip
-  * __d9cfbc4e-49d8-4f8d-9973-8f3cecdfc857__ is the object id of myotherfile.zip
 
 example URLs:
 ```
 GET    http://storageproxy.example.org/mybucket/eac590d4-2681-4947-9c1a-26c8e1765da2
-GET    http://storageproxy.example.org/mybucket/d9cfbc4e-49d8-4f8d-9973-8f3cecdfc857
 ```
 
 ### Object Storage
-Each object is stored in 4MB chunks. If the object itself is less than or equal to 4MB then it is stored in a single file. Each chunk is named to include it's position in the actual file and the checksum of the chunk.
+Each object is stored in 4MB chunks. Each chunk is named to include it's position in reconstructing the original file and the checksum of the chunk.
 
-For perfect files (those less than or equal to 4MB), an example name would be:
+For perfect files (those less than or equal to 4MB), only a single file would be written:
 
 0_f66c2834db5ad832ca3d31fdfae504ae07e9c95f4cf2e6beb8670b27961de45a
 
-For larger files:
+For files split into chunks:
 
 0_89dbf8cdd390aba7dcdb648553854ca7952d4bfe831044cb27a1161b4c6e5198
 1_1115a3c7a7c6a2cc08ef3f3dfb429cd427bb9eb43ffe2c9efe51a938a3e249e5
 [...]
 
+
 ### Metadata
-  * [USERINFO.gob](docs/USERINFO.md)
-  * [BUCKET.gob](docs/BUCKET.md)
-  * [OBJMETADATA.gob](docs/OBJMETADATA.md)
+  * [USER](docs/USER.md)
+  * [BUCKET](docs/BUCKET.md)
+  * [OBJECT](docs/OBJECT.md)
 
 
 ## Constraints
   * [Follow same naming convention for buckets as S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html)
     * This means bucket names are unique throughout the entire system
+
+
+## Other Notes
+* SHA256 is the preferred checksum hash
+* The hashes are not indicative of any security requirements, they are there for historical purposes and later comparison (against the hash stored in the index)
