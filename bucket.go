@@ -40,7 +40,7 @@ func (store *PerchStore) NewBucket(name string, owner *User) (*Bucket, error) {
 		return &Bucket{}, errors.New("Bucket already exists")
 	}
 
-	if err := os.Mkdir(bucket.Path, 0655); err != nil {
+	if err := os.Mkdir(bucket.Path, 0755); err != nil {
 		return &Bucket{}, err
 	}
 

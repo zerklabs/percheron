@@ -53,7 +53,7 @@ func (bucket *Bucket) NewObject(name string, size int64) (*Object, error) {
 		return &Object{}, errors.New("Object already exists")
 	}
 
-	if err := os.Mkdir(obj.Path, 0655); err != nil {
+	if err := os.Mkdir(obj.Path, 0755); err != nil {
 		return &Object{}, err
 	}
 

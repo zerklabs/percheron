@@ -1,7 +1,6 @@
 package percheron
 
 import (
-	"github.com/garyburd/redigo/redis"
 	"log"
 	"net"
 	"time"
@@ -32,11 +31,10 @@ var (
 type PerchStore struct {
 	Path      string
 	RedisHost string
-	Pool      *redis.Pool
 	Peers     []net.IPAddr
 }
 
-func NewPerchStore(folderPath string, redisHost string) *PerchStore {
+func NewPerchStore(folderPath string) *PerchStore {
 	yes, err := DoesDirExist(folderPath)
 
 	if err != nil {
@@ -47,7 +45,6 @@ func NewPerchStore(folderPath string, redisHost string) *PerchStore {
 		// no error means the stat returned successfully
 		store := new(PerchStore)
 		store.Path = folderPath
-		store.RedisHost = redisHost
 
 		return store
 	}
@@ -55,28 +52,4 @@ func NewPerchStore(folderPath string, redisHost string) *PerchStore {
 	log.Fatalf("%s does not exist or cannot be accessed", folderPath)
 
 	return new(PerchStore)
-}
-
-func (self *PerchStore) EstablishPool() {
-	self.Pool = &redis.Pool{
-		MaxIdle:     3,
-		IdleTimeout: 240 * time.Second,
-		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", self.RedisHost)
-			if err != nil {
-				log.Fatal(err)
-				return nil, err
-			}
-
-			return c, err
-		},
-		TestOnBorrow: func(c redis.Conn, t time.Time) error {
-			_, err := c.Do("PING")
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			return err
-		},
-	}
 }
